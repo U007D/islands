@@ -1,0 +1,8 @@
+[build]
+rustc-wrapper = "/Users/sergibli/.cargo/bin/clippy-driver"
+
+[env]
+CLIPPY_TESTS = "true"
+
+[net]
+git-fetch-with-cli = true
