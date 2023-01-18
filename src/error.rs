@@ -1,5 +1,6 @@
 pub mod arg;
 pub mod io;
+pub mod non_empty_rect_list_2d;
 
 use crate::shared_consts::*;
 use thiserror::Error;

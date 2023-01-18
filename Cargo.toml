@@ -15,6 +15,7 @@ name = "lib"
 path = "src/lib.rs"
 
 [dependencies]
+assert_matches = "1.5.0"
 bool_ext = "0.5.3"
 he_std = { git = "ssh://github/u007d/he_std.git", branch = "main" }
 termination = "0.1.2"

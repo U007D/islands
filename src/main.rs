@@ -6,11 +6,11 @@
     clippy::unwrap_used
 )]
 #![warn(clippy::all, clippy::nursery, clippy::pedantic, rust_2018_idioms)]
-// Safety-critical application lints
 #![allow(
     clippy::equatable_if_let,
     clippy::implicit_return,
     clippy::iter_nth_zero,
+    clippy::option_map_unit_fn,
     clippy::match_bool,
     clippy::missing_errors_doc,
     clippy::module_name_repetitions,

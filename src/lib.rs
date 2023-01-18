@@ -11,6 +11,7 @@
     clippy::equatable_if_let,
     clippy::implicit_return,
     clippy::iter_nth_zero,
+    clippy::option_map_unit_fn,
     clippy::match_bool,
     clippy::missing_errors_doc,
     clippy::module_name_repetitions,
@@ -30,6 +31,31 @@
 
 pub mod args;
 pub mod error;
+mod non_empty_rect_list_2d;
 pub mod shared_consts;
+#[cfg(test)]
+mod unit_tests;
+mod visited_world;
+mod world;
 
 pub use error::{Error, Result};
+pub use non_empty_rect_list_2d::NonEmptyRectList2D;
+pub use visited_world::VisitedWorld;
+pub use world::World;
+
+#[must_use]
+pub fn count_islands(world_ref: &World) -> usize {
+    let mut visited = VisitedWorld::from(world_ref);
+    (0..visited.rows())
+        .map(|row| {
+            (0..visited.cols())
+                .filter(|&col| {
+                    visited
+                        .is_unvisited_land(row, col)
+                        .then_some(|| visited.visit_contiguous_land(row, col))
+                        .is_some()
+                })
+                .count()
+        })
+        .sum()
+}

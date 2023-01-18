@@ -1,5 +1,6 @@
 [build]
 rustc-wrapper = "/Users/sergibli/.cargo/bin/clippy-driver"
+rustflags = "--cfg no_global_oom_handling"
 
 [env]
 CLIPPY_TESTS = "true"
