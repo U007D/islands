@@ -6,6 +6,7 @@ use crate::shared_consts::*;
 
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
+/// [`NonEmptyRectList2D`] errors.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, Debug, Error, PartialEq)]
 pub enum Error {

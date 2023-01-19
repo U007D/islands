@@ -10,6 +10,8 @@ use std::{
 pub use crate::{error::non_empty_rect_list_2d::Result, NonEmptyRectList2D};
 pub use terrain::Terrain;
 
+/// Provides the [`Terrain`] type ([`Terrain::Water`] or [`Terrain::Land`]) for each location in the
+/// world.
 #[derive(Clone, Debug, Default, Eq, Hash, PartialEq)]
 pub struct World {
     list: NonEmptyRectList2D<Terrain>,
@@ -18,6 +20,15 @@ pub struct World {
 }
 
 impl World {
+    /// Constructor
+    ///
+    /// # Returns
+    /// * `Err(error::non_empty_rec_list_2d::Error)` if total element count is 0 or `> isize::MAX`
+    /// `isize::MAX` is a Rust `std` constraint driven directly by LLVM.
+    ///
+    /// # Panics
+    /// Does not panic, but underlying `Vec` allocation may panic (until Rust stabilizes fallible
+    /// collections).
     pub fn new<TIntoNonZeroUsize>(
         terrain: Terrain,
         rows: TIntoNonZeroUsize,
@@ -35,6 +46,7 @@ impl World {
         };
         Ok(world)
     }
+    /// Returns the number of columns (width) of the 2D `World` list.
     #[must_use]
     #[inline]
     #[allow(clippy::missing_const_for_fn)]
@@ -42,6 +54,7 @@ impl World {
         self.cols
     }
 
+    /// Returns the number of rows (height) of the 2D `World` list.
     #[must_use]
     #[inline]
     #[allow(clippy::missing_const_for_fn)]
@@ -49,6 +62,7 @@ impl World {
         self.rows
     }
 
+    /// Predicate indicating whether or not the `Terrain` at the given location is land or water.
     #[must_use]
     #[inline]
     pub fn is_land(&self, row: usize, col: usize) -> Option<bool> {

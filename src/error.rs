@@ -7,6 +7,7 @@ use thiserror::Error;
 
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
+/// Crate-level error type grouping all error categories emitted by this crate under one umbrella.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, Debug, Error, PartialEq)]
 pub enum Error {

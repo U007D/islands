@@ -1,3 +1,4 @@
+/// Error messages
 pub const ERR_BAD_ARG_COUNT: &str = "Incorrect number of arguments received";
 pub const ERR_ARG_NOT_CONVERTIBLE_TO_UTF_8: &str =
     "Error: supplied command-line argument not convertible to UTF-8";
@@ -20,8 +21,10 @@ pub const ERR_RECT_NO_INPUT_DATA: &str =
 pub const ERR_ROW_COLUMN_OVERFLOW: &str =
     "Error: Number of specified rows x columns exceeds `usize::MAX`";
 
+/// Panic messages
 pub const PANIC_INDEX_OUT_OF_BOUNDS: &str = "Panic: Index out of bounds";
 
+/// Miscellaneous messages
 pub const BUT_EXPECTED: &str = "but expected";
 pub const ROWS_BUT_INDEX_IS: &str = "rows, but index is";
 pub const FROM: &str = "from";

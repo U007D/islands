@@ -5,6 +5,7 @@ use thiserror::Error;
 
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
+/// Domain IO Errors implement [`PartialEq`] principally to make testing simpler.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, Debug, Error, PartialEq)]
 pub enum Error {
@@ -20,6 +21,7 @@ pub enum Error {
     IoError(#[from] wrapped_std_io::Error),
 }
 
+/// Converters to seamlessly coerce [`std::io::Error`]s into (domain) [`io::Error`]s.
 impl Error {
     pub fn as_file_create_err_cx<TError>(error: TError) -> Self where TError: Into<wrapped_std_io::Error> {
         Self::FileCreateError(error.into())

@@ -4,6 +4,7 @@ use thiserror::Error;
 
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
+/// CLI argument errors
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, Debug, Error, PartialEq)]
 pub enum Error {
