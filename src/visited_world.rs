@@ -1,4 +1,10 @@
-use std::ops::Not;
+#[cfg(test)]
+mod unit_tests;
+
+use std::{
+    ops::Not,
+    slice::{Iter, IterMut},
+};
 
 use crate::{NonEmptyRectList2D, World};
 
@@ -10,7 +16,7 @@ use crate::{NonEmptyRectList2D, World};
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct VisitedWorld<'world> {
     world: &'world World,
-    visited: NonEmptyRectList2D<bool>,
+    visited_list: NonEmptyRectList2D<bool>,
 }
 
 impl<'world> VisitedWorld<'world> {
@@ -27,7 +33,17 @@ impl<'world> VisitedWorld<'world> {
     #[must_use]
     pub fn is_unvisited_land(&self, row: usize, col: usize) -> bool {
         self.world.is_land(row, col).unwrap_or(false)
-            && self.visited.get(row, col).map_or(false, |&visited| visited.not())
+            && self.visited_list.get(row, col).map_or(false, |&visited| visited.not())
+    }
+
+    /// Immutable iterator constructor.
+    pub fn iter(&self) -> Iter<'_, <Self as IntoIterator>::Item> {
+        self.visited_list.iter()
+    }
+
+    /// Mutable iterator constructor.
+    pub fn iter_mut(&mut self) -> IterMut<'_, <Self as IntoIterator>::Item> {
+        self.visited_list.iter_mut()
     }
 
     /// Returns the number of rows (height) of the 2D Visited list.
@@ -40,30 +56,30 @@ impl<'world> VisitedWorld<'world> {
     /// Unconditionally mark the specified location as having been visited.  Writing to
     /// out-of-bounds co-ordinates is treated as a no-op.
     #[inline]
-    pub fn set_visited(&mut self, row: usize, col: usize) -> &mut Self {
-        let dbg_success = self.visited.set(row, col, true).is_some();
+    pub fn set_visited(&mut self, row: usize, col: usize, visited: bool) -> &mut Self {
+        let dbg_success = self.visited_list.set(row, col, visited).is_some();
         // Detect out-of-bounds write attempts in debug builds
         debug_assert!(
             dbg_success,
-            format!("`VisitedWorld::set_visited()` called with OOB coords: ({row}, {col})")
+            "`VisitedWorld::set_visited()` called with OOB coords: ({row}, {col})"
         );
         self
     }
 
     /// Recursively explore unvisited land that is vertically or horizontally adjacent to the given
     /// coordinate, to world's edge or until water is encountered, marking each location as visited
-    /// as we go.  The initial starting coordinate is *not* marked as visited.
-    pub fn visit_contiguous_land(&mut self, row: usize, col: usize) {
+    /// as we go.  The state at the starting search coordinate will be left unchanged.
+    pub fn visit_contiguous_land(&mut self, row: usize, col: usize) -> &mut Self {
         self.visit_contiguous_land_inner(row, col, 0);
+        self
     }
 
     /// Track the depth of recursion.  With this depth information the algorithm can differentiate
-    /// between the first call and all subsequent recursive calls to avoid marking the initial
-    /// coordinate as visited.
+    /// between the first call and all subsequent recursive calls to restore the initial
+    /// state of the starting search coordinate.
     fn visit_contiguous_land_inner(&mut self, row: usize, col: usize, depth: usize) {
         self.is_unvisited_land(row, col).then(|| {
-            (depth > 0).then(|| self.set_visited(row, col));
-
+            self.set_visited(row, col, true);
             let deeper = depth.saturating_add(1);
             (row.checked_sub(1))
                 .map(|prev_row| self.visit_contiguous_land_inner(prev_row, col, deeper));
@@ -73,6 +89,7 @@ impl<'world> VisitedWorld<'world> {
                 .map(|prev_col| self.visit_contiguous_land_inner(row, prev_col, deeper));
             (col.checked_add(1))
                 .map(|next_col| self.visit_contiguous_land_inner(row, next_col, deeper));
+            (depth == 0).then(|| self.set_visited(row, col, false));
         });
     }
 }
@@ -87,9 +104,19 @@ impl<'world> VisitedWorld<'world> {
 impl<'world> From<&'world World> for VisitedWorld<'world> {
     fn from(world: &'world World) -> Self {
         Self {
-            visited: NonEmptyRectList2D::new(false, world.rows(), world.cols())
+            visited_list: NonEmptyRectList2D::new(false, world.rows(), world.cols())
                 .unwrap_or_else(|err| unreachable!("{err:}")),
             world,
         }
+    }
+}
+
+/// Consuming iterator constructor.
+impl<'world> IntoIterator for VisitedWorld<'world> {
+    type Item = bool;
+    type IntoIter = <Vec<bool> as IntoIterator>::IntoIter;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.visited_list.into_vec().into_iter()
     }
 }

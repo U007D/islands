@@ -5,9 +5,13 @@ mod unit_tests;
 use std::{
     fmt::Debug,
     num::NonZeroUsize,
+    slice::{Iter, IterMut},
 };
 
-pub use crate::{error::non_empty_rect_list_2d::Result, NonEmptyRectList2D};
+pub use crate::{
+    error::non_empty_rect_list_2d::{Error, Result},
+    NonEmptyRectList2D,
+};
 pub use terrain::Terrain;
 
 /// Provides the [`Terrain`] type ([`Terrain::Water`] or [`Terrain::Land`]) for each location in the
@@ -54,6 +58,16 @@ impl World {
         self.cols
     }
 
+    /// Immutable iterator constructor.
+    pub fn iter(&self) -> Iter<'_, <Self as IntoIterator>::Item> {
+        self.list.iter()
+    }
+
+    /// Mutable iterator constructor.
+    pub fn iter_mut(&mut self) -> IterMut<'_, <Self as IntoIterator>::Item> {
+        self.list.iter_mut()
+    }
+
     /// Returns the number of rows (height) of the 2D `World` list.
     #[must_use]
     #[inline]
@@ -67,5 +81,37 @@ impl World {
     #[inline]
     pub fn is_land(&self, row: usize, col: usize) -> Option<bool> {
         self.list.get(row, col).map(|&terrain| terrain == Terrain::Land)
+    }
+}
+
+/// Consuming iterator constructor
+impl IntoIterator for World {
+    type Item = Terrain;
+    type IntoIter = <NonEmptyRectList2D<Self::Item> as IntoIterator>::IntoIter;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.list.into_iter()
+    }
+}
+
+/// Converting Constructor
+impl<TTryIntoNonZeroUsize> TryFrom<(Vec<Terrain>, TTryIntoNonZeroUsize, TTryIntoNonZeroUsize)>
+    for World
+where
+    TTryIntoNonZeroUsize: TryInto<NonZeroUsize>,
+    <TTryIntoNonZeroUsize as TryInto<NonZeroUsize>>::Error: Debug,
+{
+    type Error = Error;
+
+    fn try_from(
+        (vec, rows, cols): (Vec<Terrain>, TTryIntoNonZeroUsize, TTryIntoNonZeroUsize),
+    ) -> std::result::Result<Self, Self::Error> {
+        let list = NonEmptyRectList2D::try_from((vec, rows, cols))?;
+        let world = Self {
+            cols: list.cols(),
+            rows: list.rows(),
+            list,
+        };
+        Ok(world)
     }
 }

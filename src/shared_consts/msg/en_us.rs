@@ -19,7 +19,7 @@ pub const ERR_RECT_NON_RECTANGULAR_INPUT: &str =
 pub const ERR_RECT_NO_INPUT_DATA: &str =
     "Error processing `Rect` input: No data found. `Rect` requires at least one data element";
 pub const ERR_ROW_COLUMN_OVERFLOW: &str =
-    "Error: Number of specified rows x columns exceeds `usize::MAX`";
+    "Error: Number of specified rows x columns exceeds `isize::MAX`";
 
 /// Panic messages
 pub const PANIC_INDEX_OUT_OF_BOUNDS: &str = "Panic: Index out of bounds";

@@ -16,12 +16,23 @@ pub struct Args {
     pub sample_arg: String,
 }
 
+impl Args {
+    /// Manual count of number of fields in `Args` (== number of arguments expected)
+    const EXPECTED_ARG_COUNT: usize = 1;
+}
+
 /// Fallible constructor
-impl From<Box<[String]>> for Args {
-    fn from(args: Box<[String]>) -> Self {
-        Self {
-            sample_arg: args.into_vec().remove(0),
-        }
+impl TryFrom<Box<[String]>> for Args {
+    type Error = Error;
+
+    fn try_from(args: Box<[String]>) -> std::result::Result<Self, Self::Error> {
+        let arg_count = args.len();
+        (arg_count == Self::EXPECTED_ARG_COUNT).ok_or_err_with(
+            || Error::BadArgCount(arg_count, Self::EXPECTED_ARG_COUNT),
+            || Self {
+                sample_arg: args.into_vec().remove(0),
+            },
+        )
     }
 }
 
