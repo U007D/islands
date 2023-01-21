@@ -10,13 +10,14 @@ mod unit_tests;
 #[must_use]
 pub fn count_islands(world: &World) -> usize {
     let mut visited = HashSet::new();
-    (0..world.rows()).map(|row| {
-                         (0..world.cols())
+    (0..world.rows())
+        .map(|row| {
+            (0..world.cols())
                 // Retain current element if it is land and not yet visited.  Mark as visited.
                 .filter(|&col| {
                     world.is_land(row, col).unwrap_or(false) && visited.insert((row, col))
                 })
                 .count()
-                     })
-                     .sum()
+        })
+        .sum()
 }
