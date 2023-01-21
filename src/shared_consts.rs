@@ -3,16 +3,16 @@
 // parsing of conditionally compiled out submodules.
 #[cfg(feature = "const_trait_impl")]
 mod cli_arg_from;
-#[cfg(not(feature = "const_trait_impl"))]
-mod cli_arg_into;
 #[cfg(feature = "const_trait_impl")]
 mod cli_arg_from;
+#[cfg(not(feature = "const_trait_impl"))]
+mod cli_arg_into;
 
 pub mod msg;
 
 /// Typically the first argument passed into an application is the executable name.  According to
-/// [`std::env::args`] documentation, this first argument may be arbitrary text, or may even not exist
-/// at all!  [`CliArg`] provides context on the meaning of the first argument of the program.
+/// [`std::env::args`] documentation, this first argument may be arbitrary text, or may even not
+/// exist at all!  [`CliArg`] provides context on the meaning of the first argument of the program.
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub enum CliArg {
     NoProgramNameArg,

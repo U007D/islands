@@ -1,34 +1,25 @@
-use std::{
-    io::Error as IoError,
-    fmt::{Display, Formatter, Result as IoResult}
-};
+use std::{fmt::{Display, Formatter, Result as IoResult},
+          io::Error as IoError};
+
 use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub struct Error(IoError);
 
 impl Clone for Error {
-    fn clone(&self) -> Self {
-        Self(IoError::new(self.0.kind(), self.0.to_string()))
-    }
+    fn clone(&self) -> Self { Self(IoError::new(self.0.kind(), self.0.to_string())) }
 }
 
 impl Eq for Error {}
 
 impl Display for Error {
-    fn fmt(&self, f: &mut Formatter<'_>) -> IoResult {
-        write!(f, "{}", self.0)
-    }
+    fn fmt(&self, f: &mut Formatter<'_>) -> IoResult { write!(f, "{}", self.0) }
 }
 
 impl From<std::io::Error> for Error {
-    fn from(err: std::io::Error) -> Self {
-        Self(err)
-    }
+    fn from(err: std::io::Error) -> Self { Self(err) }
 }
 
 impl PartialEq for Error {
-    fn eq(&self, rhs: &Self) -> bool {
-        self.0.kind() == rhs.0.kind()
-    }
+    fn eq(&self, rhs: &Self) -> bool { self.0.kind() == rhs.0.kind() }
 }

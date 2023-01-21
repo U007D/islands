@@ -1,9 +1,10 @@
 pub mod arg;
 pub mod io;
-pub mod non_empty_rect_list_2d;
+pub mod world_map;
+
+use thiserror::Error;
 
 use crate::shared_consts::*;
-use thiserror::Error;
 
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 

@@ -1,7 +1,8 @@
 mod wrapped_std_io;
 
-use crate::shared_consts::*;
 use thiserror::Error;
+
+use crate::shared_consts::*;
 
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
@@ -23,19 +24,23 @@ pub enum Error {
 
 /// Converters to seamlessly coerce [`std::io::Error`]s into (domain) [`io::Error`]s.
 impl Error {
-    pub fn as_file_create_err_cx<TError>(error: TError) -> Self where TError: Into<wrapped_std_io::Error> {
+    pub fn as_file_create_err_cx<TError>(error: TError) -> Self
+        where TError: Into<wrapped_std_io::Error>, {
         Self::FileCreateError(error.into())
     }
 
-    pub fn as_file_open_err_cx<TError>(error: TError) -> Self where TError: Into<wrapped_std_io::Error> {
+    pub fn as_file_open_err_cx<TError>(error: TError) -> Self
+        where TError: Into<wrapped_std_io::Error>, {
         Self::FileOpenError(error.into())
     }
 
-    pub fn as_file_read_err_cx<TError>(error: TError) -> Self where TError: Into<wrapped_std_io::Error> {
+    pub fn as_file_read_err_cx<TError>(error: TError) -> Self
+        where TError: Into<wrapped_std_io::Error>, {
         Self::FileReadError(error.into())
     }
 
-    pub fn as_file_write_err_cx<TError>(error: TError) -> Self where TError: Into<wrapped_std_io::Error> {
+    pub fn as_file_write_err_cx<TError>(error: TError) -> Self
+        where TError: Into<wrapped_std_io::Error>, {
         Self::FileWriteError(error.into())
     }
 }

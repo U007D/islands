@@ -1,78 +1,99 @@
-use crate::error::non_empty_rect_list_2d::Error;
-use assert2::assert;
-use assert_matches::assert_matches;
+use std::iter;
 
-#[allow(unused_imports)]
+use assert2::assert;
+
 use super::*;
 
 #[test]
-fn zero_row_world_does_not_construct() {
+fn zero_row_one_col_world_is_empty() {
     // Given
-    let (rows, cols) = (0, 0);
-    let terrain = Terrain::default();
+    let (rows, cols) = (0, 1);
+    let value = Terrain::Water;
     let sut = World::new;
 
     // When
-    let res = sut(terrain, rows, cols);
+    let res = sut(value, rows, cols);
 
     // Then
-    assert_matches!(res, Err(Error::NoData(_)));
+    let res = res.unwrap();
+    assert!(res.is_empty());
 }
 
 #[test]
-fn one_empty_row_world_does_not_construct() {
+fn one_row_zero_col_world_is_empty() {
     // Given
     let (rows, cols) = (1, 0);
-    let terrain = Terrain::Land;
+    let value = Terrain::default();
     let sut = World::new;
 
     // When
-    let res = sut(terrain, rows, cols);
+    let res = sut(value, rows, cols);
 
     // Then
-    assert_matches!(res, Err(Error::NoData(_)));
+    let res = res.unwrap();
+    assert!(res.is_empty());
 }
 
 #[test]
-fn one_row_world_constructs() {
+fn zero_row_zero_col_world_is_empty() {
+    // Given
+    let (rows, cols) = (0, 0);
+    let value = Terrain::Land;
+    let sut = World::new;
+
+    // When
+    let res = sut(value, rows, cols);
+
+    // Then
+    let res = res.unwrap();
+    assert!(res.is_empty());
+}
+
+#[test]
+fn one_row_one_col_world_constructs() {
     // Given
     let (rows, cols) = (1, 1);
-    let terrain = Terrain::Land;
-    let expected_list = NonEmptyRectList2D::new(terrain, rows, cols).unwrap();
-    let (expected_rows, expected_cols) = (rows, cols);
+    let value = Terrain::Water;
+    let expected_res = iter::once(Terrain::Water);
     let sut = World::new;
 
     // When
-    let res = sut(terrain, rows, cols);
+    let res = sut(value, rows, cols);
 
     // Then
     assert!(res.is_ok());
     let res = res.unwrap();
-    assert!(res.list == expected_list);
-    assert!(res.rows() == expected_rows);
-    assert!(res.cols() == expected_cols);
+    assert!(res.into_iter().eq(expected_res));
 }
 
 #[test]
-fn two_row_world_constructs() {
+fn two_row_three_col_world_constructs() {
     // Given
-    let (rows, cols) = (2, 1);
-    let terrain = Terrain::Water;
-    #[rustfmt::skip]
-        let expected_res = [
-        terrain,
-        terrain,
-    ].into_iter();
-    let (expected_rows, expected_cols) = (rows, cols);
+    let (rows, cols) = (2, 3);
+    let value = Terrain::default();
+    let expected_res = vec![Terrain::Water; rows * cols];
     let sut = World::new;
 
     // When
-    let res = sut(terrain, rows, cols);
+    let res = sut(value, rows, cols);
 
     // Then
     assert!(res.is_ok());
     let res = res.unwrap();
-    assert!(res.rows() == expected_rows);
-    assert!(res.cols() == expected_cols);
     assert!(res.into_iter().eq(expected_res));
+}
+
+#[test]
+fn rows_and_cols_accessors_return_expected_dimensions() {
+    // Given
+    let (rows, cols) = (3, 4);
+    let value = Terrain::Land;
+    let expected_res = (rows, cols);
+    let sut = World::new(value, rows, cols).unwrap();
+
+    // When
+    let res = (sut.rows(), sut.cols());
+
+    // Then
+    assert!((res.0, res.1) == expected_res);
 }

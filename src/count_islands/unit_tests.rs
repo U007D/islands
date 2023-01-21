@@ -4,18 +4,18 @@ use assert2::assert;
 
 #[allow(unused_imports)]
 use super::*;
-use crate::world::Terrain;
+use crate::Terrain;
 
 #[test]
 fn single_cell_water_world_returns_0() {
-    /* Given */
+    // Given
     let expected_res = 0;
     let world = World::new(Terrain::Water, 1, 1).unwrap();
     let sut = count_islands;
 
-    /* When */
+    // When
     let res = sut(&world);
 
-    /* Then */
+    // Then
     assert!(res == expected_res);
 }
